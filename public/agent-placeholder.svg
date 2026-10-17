@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 600">
+  <rect width="480" height="600" fill="#e8e3da"/>
+  <circle cx="240" cy="230" r="92" fill="#c7bfb1"/>
+  <path d="M70 600c10-130 80-200 170-200s160 70 170 200z" fill="#c7bfb1"/>
+  <text x="240" y="560" text-anchor="middle" font-family="system-ui, sans-serif" font-size="22" fill="#6b655c">Agent headshot</text>
+</svg>

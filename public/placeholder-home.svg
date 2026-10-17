@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cfe3e8"/>
+      <stop offset="1" stop-color="#f3ece1"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="480" fill="url(#sky)"/>
+  <rect y="360" width="640" height="120" fill="#c9d6b8"/>
+  <path d="M190 230 320 140l130 90" fill="#9aa7ad"/>
+  <rect x="210" y="225" width="220" height="140" fill="#f7f4ee"/>
+  <rect x="300" y="295" width="40" height="70" fill="#1f5f74"/>
+  <rect x="235" y="255" width="44" height="40" fill="#bcd3da"/>
+  <rect x="361" y="255" width="44" height="40" fill="#bcd3da"/>
+  <text x="320" y="430" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" fill="#5b6770">Photo coming soon</text>
+</svg>

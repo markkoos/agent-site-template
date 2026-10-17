@@ -1,0 +1,32 @@
+# Pulls MLS changes into MongoDB on a schedule — free, and independent of where the site is hosted.
+# Add MONGODB_URI, RESO_BASE_URL, RESO_ACCESS_TOKEN (and optional RESO_BASE_FILTER)
+# under GitHub → repo Settings → Secrets and variables → Actions.
+# Requires a committed package-lock.json (created by your first `npm install`).
+# Check your MLS rules for the required refresh frequency and adjust the cron.
+name: Sync MLS listings
+
+on:
+  schedule:
+    - cron: "17 */4 * * *" # every 4 hours, at :17 past
+  workflow_dispatch: {}
+
+jobs:
+  sync:
+    if: ${{ vars.ENABLE_MLS_SYNC == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx tsx scripts/sync-reso.ts
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          RESO_BASE_URL: ${{ secrets.RESO_BASE_URL }}
+          RESO_ACCESS_TOKEN: ${{ secrets.RESO_ACCESS_TOKEN }}
+          RESO_BASE_FILTER: ${{ secrets.RESO_BASE_FILTER }}
+          RESO_RESOURCE: Property
+          RESO_EXPAND: Media
