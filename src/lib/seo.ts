@@ -10,6 +10,8 @@ import { fullAddress } from "./format";
 import type { Listing } from "./listings/types";
 
 export const absoluteUrl = (path = "/") => `${site.url}${path.startsWith("/") ? path : `/${path}`}`;
+/** Absolute URL for an asset that may already be absolute (e.g. a CDN image). */
+export const assetUrl = (src: string) => (/^https?:\/\//.test(src) ? src : absoluteUrl(src));
 
 export const AGENT_ID = `${site.url}/#agent`;
 export const BROKERAGE_ID = `${site.url}/#brokerage`;
@@ -53,7 +55,7 @@ export function agentSchema() {
     jobTitle: site.agent.jobTitle,
     description: site.agent.shortBio,
     url: site.url,
-    image: absoluteUrl(site.agent.headshot),
+    image: assetUrl(site.agent.headshot),
     telephone: site.agent.phone,
     email: site.agent.email,
     knowsLanguage: site.agent.languages,
@@ -81,6 +83,7 @@ export function agentSchema() {
     ],
     award: site.agent.awards,
     worksFor: { "@id": BROKERAGE_ID },
+    ...(site.foundingYear ? { foundingDate: String(site.foundingYear) } : {}),
     sameAs: sameAs(),
   };
 }
@@ -92,6 +95,9 @@ export function brokerageSchema() {
     "@type": "Organization",
     "@id": BROKERAGE_ID,
     name: b.name,
+    ...(site.team.length
+      ? { employee: site.team.map((m) => ({ "@type": "Person", name: m.name, jobTitle: m.title })) }
+      : {}),
     telephone: b.phone,
     address: {
       "@type": "PostalAddress",
@@ -114,7 +120,7 @@ export function websiteSchema() {
     publisher: { "@id": AGENT_ID },
     potentialAction: {
       "@type": "SearchAction",
-      target: { "@type": "EntryPoint", urlTemplate: `${site.url}/listings?q={search_term_string}` },
+      target: { "@type": "EntryPoint", urlTemplate: `${site.url}/properties?q={search_term_string}` },
       "query-input": "required name=search_term_string",
     },
   };
@@ -153,7 +159,7 @@ export function listingSchema(l: Listing, path: string) {
   return {
     "@context": "https://schema.org",
     "@type": "RealEstateListing",
-    name: fullAddress(l),
+    name: l.title ?? fullAddress(l),
     url: absoluteUrl(path),
     description: l.description.slice(0, 500),
     datePosted: l.listedAt,
@@ -223,7 +229,7 @@ export function profilePageSchema() {
       "@id": `${site.url}/#person`,
       name: site.agent.name,
       jobTitle: site.agent.jobTitle,
-      image: absoluteUrl(site.agent.headshot),
+      image: assetUrl(site.agent.headshot),
       worksFor: { "@id": BROKERAGE_ID },
       knowsLanguage: site.agent.languages,
       sameAs: sameAs(),

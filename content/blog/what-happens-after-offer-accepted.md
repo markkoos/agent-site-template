@@ -15,7 +15,7 @@ sources:
     url: "https://www.consumerfinance.gov/owning-a-home/"
 ---
 
-*Sample article — replace with the agent's own experience and local details. Posts that include specific, first-hand detail ("in Harbor Point, most sellers ask for…") earn more trust from readers and search engines than generic advice.*
+*Sample article — replace with the agent's own experience and local details. Posts that include specific, first-hand detail ("in our area, most sellers ask for…") earn more trust from readers and search engines than generic advice.*
 
 ## 1. Deposit earnest money (first few days)
 

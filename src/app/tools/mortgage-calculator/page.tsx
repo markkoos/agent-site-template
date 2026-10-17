@@ -18,25 +18,36 @@ const faqs = [
   },
   {
     q: "How much should I put down on a house?",
-    a: "There's no single right answer. Twenty percent down avoids private mortgage insurance on conventional loans, but many buyers put down 3–10% or use FHA or VA programs. A lender can show how different down payments change your payment and cash needed to close.",
+    a: "There's no single right answer. Twenty percent down avoids private mortgage insurance on conventional loans, but many buyers put down less or use other loan programs. A lender can show how different down payments change your payment and cash to close.",
   },
 ];
 
 export default function MortgageCalculatorPage() {
   return (
-    <div className="container" style={{ paddingBottom: 72 }}>
+    <div className="container-page py-12 md:py-16">
       <Breadcrumbs items={[{ name: "Mortgage calculator", path: "/tools/mortgage-calculator" }]} />
-      <div className="page-head" style={{ paddingTop: 8 }}>
-        <h1>Mortgage calculator</h1>
-        <p>
-          Adjust price, down payment and rate to see an estimated monthly payment. Ready to shop?{" "}
-          <Link href="/listings">Search homes</Link>.
+      <div className="mt-10 max-w-2xl">
+        <div className="eyebrow">Tools</div>
+        <h1 className="mt-2 font-serif text-4xl tracking-tight md:text-5xl">Mortgage calculator</h1>
+        <p className="mt-4 text-muted-foreground">
+          Adjust price, down payment and rate to see an estimated monthly payment. Ready to look?{" "}
+          <Link href="/properties" className="underline underline-offset-4">
+            Browse properties
+          </Link>
+          .
         </p>
       </div>
-      <MortgageCalculator />
-      <section className="narrow" style={{ marginTop: 64 }}>
-        <h2>Mortgage questions</h2>
-        <FaqList faqs={faqs} />
+      <div className="mt-12">
+        <MortgageCalculator />
+      </div>
+      <section className="mt-24 grid gap-12 border-t border-border/60 pt-16 md:grid-cols-12">
+        <div className="md:col-span-4">
+          <div className="eyebrow">Questions</div>
+          <h2 className="mt-2 font-serif text-3xl">Mortgage FAQ</h2>
+        </div>
+        <div className="md:col-span-8">
+          <FaqList faqs={faqs} />
+        </div>
       </section>
     </div>
   );

@@ -4,6 +4,7 @@ import { AuthorBox } from "@/components/AuthorBox";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { FaqList } from "@/components/FaqList";
 import { JsonLd } from "@/components/JsonLd";
+import { btn } from "@/components/ui";
 import { getAllPosts, getPost } from "@/lib/content";
 import { formatDate } from "@/lib/format";
 import { pageMetadata, postSchema } from "@/lib/seo";
@@ -30,71 +31,77 @@ export default async function PostPage({ params }: Props) {
   if (!post) notFound();
 
   return (
-    <article className="narrow" style={{ paddingBottom: 72 }}>
-      <Breadcrumbs
-        items={[
-          { name: "Blog", path: "/blog" },
-          { name: post.title, path: `/blog/${post.slug}` },
-        ]}
-      />
-      <h1>{post.title}</h1>
-      <div className="byline">
-        <span>
-          By <Link href="/about">{site.agent.name}</Link>, {site.agent.jobTitle}
-        </span>
-        <span>
-          Published <time dateTime={post.date}>{formatDate(post.date)}</time>
-        </span>
-        {post.updated && (
+    <article className="container-page py-12 md:py-16">
+      <div className="mx-auto max-w-3xl">
+        <Breadcrumbs
+          items={[
+            { name: "Journal", path: "/blog" },
+            { name: post.title, path: `/blog/${post.slug}` },
+          ]}
+        />
+        <div className="eyebrow mt-10">{post.tags[0] ?? "Journal"}</div>
+        <h1 className="mt-3 font-serif text-4xl leading-tight tracking-tight md:text-5xl">{post.title}</h1>
+        <div className="mt-5 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
           <span>
-            Updated <time dateTime={post.updated}>{formatDate(post.updated)}</time>
+            By{" "}
+            <Link href="/about" className="text-foreground hover:underline">
+              {site.agent.name}
+            </Link>
           </span>
+          <span>
+            Published <time dateTime={post.date}>{formatDate(post.date)}</time>
+          </span>
+          {post.updated ? (
+            <span>
+              Updated <time dateTime={post.updated}>{formatDate(post.updated)}</time>
+            </span>
+          ) : null}
+          <span>{post.readingMinutes} min read</span>
+        </div>
+
+        {/* Answer-first summary: the passage AI answer engines are most likely to quote */}
+        {post.tldr ? (
+          <div className="mt-10 border-l-2 border-accent bg-card px-6 py-5">
+            <div className="eyebrow">Short answer</div>
+            <p className="mt-2 leading-relaxed">{post.tldr}</p>
+          </div>
+        ) : null}
+
+        <div className="prose-editorial mt-10" dangerouslySetInnerHTML={{ __html: post.html }} />
+
+        {post.faqs.length > 0 && (
+          <section className="mt-14">
+            <h2 className="mb-4 font-serif text-3xl">Frequently asked questions</h2>
+            <FaqList faqs={post.faqs} />
+          </section>
         )}
-        <span>{post.readingMinutes} min read</span>
-      </div>
 
-      {/* Answer-first summary: the passage AI answer engines are most likely to quote */}
-      {post.tldr && (
-        <div className="tldr">
-          <strong>Short answer</strong>
-          {post.tldr}
+        {post.sources.length > 0 && (
+          <section className="mt-12">
+            <div className="eyebrow">Sources</div>
+            <ul className="mt-3 space-y-1 text-sm">
+              {post.sources.map((s) => (
+                <li key={s.url}>
+                  <a href={s.url} target="_blank" rel="noopener" className="underline underline-offset-4">
+                    {s.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        <AuthorBox />
+
+        <div className="flex flex-col items-start gap-4 rounded-md bg-primary p-8 text-primary-foreground md:flex-row md:items-center md:justify-between">
+          <div>
+            <div className="font-serif text-2xl">Have a question about your situation?</div>
+            <p className="mt-1 text-sm text-primary-foreground/80">A straight answer from a local agent — no pressure.</p>
+          </div>
+          <Link href="/contact" className={btn.accent}>
+            Get in touch
+          </Link>
         </div>
-      )}
-
-      <div className="prose" dangerouslySetInnerHTML={{ __html: post.html }} />
-
-      {post.faqs.length > 0 && (
-        <section style={{ marginTop: 40 }}>
-          <h2>Frequently asked questions</h2>
-          <FaqList faqs={post.faqs} />
-        </section>
-      )}
-
-      {post.sources.length > 0 && (
-        <section style={{ marginTop: 40 }}>
-          <h2 style={{ fontSize: "1.2rem" }}>Sources</h2>
-          <ul className="small">
-            {post.sources.map((s) => (
-              <li key={s.url}>
-                <a href={s.url} target="_blank" rel="noopener">
-                  {s.title}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      <AuthorBox />
-
-      <div className="cta-band">
-        <div>
-          <h2 style={{ marginBottom: 6, fontSize: "1.4rem" }}>Have a question about your situation?</h2>
-          <p>Get a straight answer from a local agent — no pressure.</p>
-        </div>
-        <Link href="/contact" className="btn btn-light">
-          Ask {site.agent.name.split(" ")[0]}
-        </Link>
       </div>
 
       <JsonLd data={postSchema(post)} />

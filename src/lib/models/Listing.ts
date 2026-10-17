@@ -5,6 +5,7 @@ const ListingSchema = new Schema<Listing>(
   {
     listingKey: { type: String, required: true, unique: true },
     slug: { type: String, required: true, unique: true },
+    title: String,
     mlsNumber: String,
     status: { type: String, required: true, index: true },
     price: { type: Number, required: true },

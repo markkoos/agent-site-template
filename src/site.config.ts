@@ -1,16 +1,17 @@
 /**
  * ─────────────────────────────────────────────────────────────────────────────
  *  SITE CONFIG — the one file you edit per client.
- *  Everything below is placeholder demo content for a fictional agent.
- *  Replace it with the client's real details before launch.
+ *  Demo content: "Ellery & Vale", a fictional boutique practice (from the
+ *  Lovable design). Replace everything with the client's real details.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-export type ThemePreset = "coastal" | "modern" | "luxury";
+export type ThemePreset = "editorial" | "coastal" | "modern";
 
 export type HomeSection =
   | "hero"
   | "featuredListings"
+  | "pillars"
   | "valuationCta"
   | "aboutSnippet"
   | "areas"
@@ -23,57 +24,65 @@ export const site = {
   url: (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, ""),
 
   brand: {
-    siteName: "Jordan Rivera Homes",
-    tagline: "Coastal real estate, handled with care.",
-    /** Optional overrides on top of the theme preset (any CSS color). */
-    primaryColor: "",
-    accentColor: "",
+    siteName: "Ellery & Vale",
+    /** Small label next to the logo text. */
+    logoSuffix: "Residential",
+    tagline: "Homes with a point of view.",
   },
 
-  /** Visual preset: "coastal" | "modern" | "luxury". Fonts live in src/theme/fonts.ts. */
-  theme: "coastal" as ThemePreset,
+  /** Visual preset: "editorial" | "coastal" | "modern" (see globals.css). Fonts: src/theme/fonts.ts. */
+  theme: "editorial" as ThemePreset,
 
+  /** Primary contact person — used for bylines, author boxes and schema. */
   agent: {
-    name: "Jordan Rivera",
-    jobTitle: "REALTOR®",
-    headshot: "/agent-placeholder.svg",
-    phone: "(555) 010-2030",
+    name: "Margaux Ellery",
+    jobTitle: "Founder & REALTOR®",
+    headshot: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1200&q=80",
+    phone: "(310) 555-0148",
     email: "hello@example.com",
-    /** State license — most states require it on agent advertising. */
     licenseLabel: "DRE #",
     licenseNumber: "00000000",
-    /** Public license lookup page so visitors (and AI engines) can verify credentials. */
-    licenseVerifyUrl: "https://example.com/license-lookup",
-    yearsExperience: 12,
-    designations: ["ABR® (Accredited Buyer's Representative)", "SRS (Seller Representative Specialist)"],
-    languages: ["English", "Spanish"],
+    /** Public license lookup so visitors (and AI engines) can verify credentials. */
+    licenseVerifyUrl: "https://www2.dre.ca.gov/PublicASP/pplinfo.asp",
+    yearsExperience: 15,
+    designations: ["Certified Luxury Home Marketing Specialist (example)", "SRS (Seller Representative Specialist)"],
+    languages: ["English", "French"],
     shortBio:
-      "Jordan has helped more than 200 families buy and sell along the coast, with a focus on clear communication and data-backed pricing.",
+      "Ellery & Vale is a boutique residential practice representing architecturally significant homes across Los Angeles, the canyons, and the coast.",
     bio: [
-      "I've lived in Harbor Point for over twenty years and have spent the last twelve helping neighbors buy, sell, and invest here. Before real estate I worked in construction management, which means I notice the things inspections flag before they become negotiation problems.",
-      "My approach is simple: honest pricing backed by recent comparable sales, a marketing plan you can see in writing, and weekly updates whether there's news or not.",
+      "Ellery & Vale is a two-person residential practice founded in 2011 by Margaux Ellery and Jonah Vale. We work with a small roster of sellers and a curated buyer network — never more than we can personally handle.",
+      "We spend most of our time thinking about how a house is positioned: its story, its photography, and the small, tactile details that decide whether the right buyer walks in. When we're not on-site, we're on the phone.",
+      "The number we care about most is the one we don't publish: repeat clients. Most of our work today comes from someone we sold a home to a decade ago.",
     ],
-    awards: ["Top 5% of agents, Harbor Point Association of REALTORS® (example)"],
+    awards: [] as string[],
   },
 
+  /** Optional team shown on About (leave empty for a solo agent). */
+  team: [
+    { name: "Margaux Ellery", title: "Founder, Real Estate Agent", licenseNumber: "00000000" },
+    { name: "Jonah Vale", title: "Founder, Real Estate Agent", licenseNumber: "00000000" },
+  ],
+  teamPhotoCaption: "Margaux Ellery & Jonah Vale — Founders",
+  foundingYear: 2011,
+
   brokerage: {
-    name: "Example Realty Group",
+    name: "Ellery & Vale Residential (example brokerage)",
     licenseNumber: "00000000",
-    phone: "(555) 010-9000",
+    phone: "(310) 555-0148",
     address: {
-      street: "100 Main Street, Suite 200",
-      city: "Harbor Point",
+      street: "100 Example Blvd, Suite 720",
+      city: "West Hollywood",
       state: "CA",
-      zip: "90000",
+      zip: "90069",
     },
   },
 
-  /** Cities/neighborhoods served — used in schema areaServed and the footer. */
-  serviceAreas: ["Harbor Point", "Cedar Ridge", "Bayview Heights"],
+  /** Cities served — used in schema areaServed, the footer and search landing pages. */
+  serviceAreas: ["Los Angeles", "Malibu", "Palm Springs"],
 
-  /** Profiles for schema "sameAs" — powerful for E-E-A-T and entity recognition. */
+  /** Profiles for schema "sameAs" — strong E-E-A-T and entity signals. */
   social: {
-    google: "", // Google Business Profile URL
+    google: "",
     zillow: "",
     realtor: "",
     instagram: "",
@@ -82,32 +91,53 @@ export const site = {
     youtube: "",
   },
 
-  officeHours: "Mon–Sat 9am–6pm, Sun by appointment",
+  officeHours: "Mon–Fri 9am–6pm",
 
   nav: [
-    { label: "Search Homes", href: "/listings" },
-    { label: "Home Value", href: "/home-valuation" },
+    { label: "Properties", href: "/properties" },
+    { label: "Home value", href: "/home-evaluation" },
     { label: "Areas", href: "/areas" },
-    { label: "Blog", href: "/blog" },
-    { label: "Mortgage Calculator", href: "/tools/mortgage-calculator" },
+    { label: "Journal", href: "/blog" },
     { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },
   ],
+  headerCta: { label: "Schedule a viewing", href: "/contact" },
 
   home: {
     hero: {
-      headline: "Find your place on the coast.",
-      subhead: "Search every home for sale, see what yours is worth, and get local advice without the pressure.",
+      eyebrow: "Est. 2011 · Los Angeles",
+      headline: "Homes with a",
+      headlineAccent: "point of view.",
+      subhead:
+        "Ellery & Vale is a boutique residential practice representing architecturally significant homes across Los Angeles, the canyons, and the coast.",
+      image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1600&q=80",
+      imageAlt: "A modern hillside home at dusk",
+      /** Small overlay card on the hero image — point it at a real listing. */
+      spotlight: { label: "Now representing", title: "Modern Hillside Retreat", meta: "Los Angeles · $4.25M" },
     },
+    /**
+     * Headline numbers under the hero. Use real, verifiable figures only
+     * (the client should be able to back each one up). Demo values below.
+     */
+    stats: [
+      { label: "Sold volume", value: "$1.4B" },
+      { label: "Homes represented", value: "312" },
+      { label: "Avg. days on market", value: "21" },
+    ],
+    pillars: [
+      { title: "Discretion", text: "Off-market representation and quiet buyer introductions across our private roster." },
+      { title: "Craft", text: "Positioning, brand, and photography treated with the same seriousness as the house itself." },
+      { title: "Reach", text: "A curated network of buyers who understand what they're looking at." },
+    ],
     /** Reorder, remove or repeat sections to restyle the homepage per client. */
     sections: [
       "hero",
       "featuredListings",
+      "pillars",
       "valuationCta",
-      "aboutSnippet",
       "areas",
-      "testimonials",
       "latestPosts",
+      "testimonials",
       "faq",
     ] as HomeSection[],
   },
@@ -115,37 +145,37 @@ export const site = {
   /**
    * REAL client reviews only (copy from Google/Zillow with permission).
    * Never publish invented testimonials — it violates FTC rules and kills trust.
-   * Example: { quote: "…", name: "Maria G.", context: "Sold in Cedar Ridge, 2026", source: "Google" }
+   * Example: { quote: "…", name: "Maria G.", context: "Sold in Malibu, 2026", source: "Google" }
    */
   testimonials: [] as { quote: string; name: string; context?: string; source?: string }[],
 
   /** General FAQs (homepage + About). Answer-first, 40–80 words each — ideal for AEO. */
   faqs: [
     {
-      q: "How much does it cost to work with a buyer's agent?",
-      a: "Buyer-agent compensation is negotiable and is agreed in writing before you tour homes. Sometimes the seller offers to cover part or all of it; sometimes the buyer pays. I'll walk you through the options and put our agreement in plain language before we start.",
+      q: "What areas does Ellery & Vale cover?",
+      a: "We represent homes across Los Angeles, the canyons, Malibu, and Palm Springs. If you're considering a property just outside those areas, reach out — we'll tell you honestly whether we're the right fit or refer you to someone who is.",
     },
     {
-      q: "How long does it take to sell a home here?",
-      a: "It depends on price, condition and season. Well-priced, well-prepared homes often go under contract within a few weeks, while overpriced homes tend to sit. I'll show you current days-on-market for homes like yours in a free pricing review.",
+      q: "Do you handle off-market listings?",
+      a: "Yes. Some sellers prefer a quiet sale introduced only to qualified buyers. It can protect privacy and reduce disruption, but it also limits exposure, so we walk through the trade-offs before recommending it.",
     },
     {
-      q: "Is the online home value estimate accurate?",
-      a: "Automated estimates are a starting point based on public records and nearby sales. They can't see your upgrades or condition. For a reliable number, request a free comparative market analysis (CMA) and I'll prepare one personally.",
+      q: "How can I get a valuation of my home?",
+      a: "Request a private, agent-prepared valuation on our Home Evaluation page. We review recent comparable sales and current demand in your micro-market, and respond within one business day.",
     },
   ],
 
   legal: {
     /** Required by most MLSs on any page showing IDX listings — get exact wording from the MLS. */
     mlsDisclaimer:
-      "Listing information is deemed reliable but not guaranteed and should be independently verified. Listings displayed may be held by brokerages other than the site owner. Demo data shown — not actual listings.",
+      "Listing information is deemed reliable but not guaranteed and should be independently verified. Demo data shown — not actual listings.",
     equalHousing: true,
   },
 
   seo: {
-    defaultTitle: "Jordan Rivera | Harbor Point Real Estate Agent",
+    defaultTitle: "Ellery & Vale — Boutique Los Angeles Real Estate",
     defaultDescription:
-      "Search homes for sale in Harbor Point, Cedar Ridge and Bayview Heights, get a free home value estimate, and get local real estate advice from Jordan Rivera, REALTOR®.",
+      "Boutique Los Angeles real estate representing architecturally significant homes across LA, the canyons, Malibu and Palm Springs. Search properties, request a home valuation, and read market notes.",
     /** Let AI answer engines (ChatGPT, Claude, Perplexity, Gemini) crawl and cite the site. */
     allowAiCrawlers: true,
   },

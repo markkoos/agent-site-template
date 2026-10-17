@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { btn, control, label } from "./ui";
 
 type Estimate = { value: number; low: number; high: number } | null;
 
@@ -29,46 +30,45 @@ export function ValuationForm() {
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = Object.fromEntries(new FormData(e.currentTarget).entries()) as Record<string, string>;
-    const payload = { ...data, ...fd };
     setStatus("sending");
     try {
       const res = await fetch("/api/valuation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...data, ...fd }),
       });
       const json = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(json.error || "Something went wrong.");
+      if (!res.ok) throw new Error(json.error || "Something went wrong. Please try again.");
       setEstimate(json.estimate ?? null);
       setStatus("done");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
       setStatus("err");
     }
   }
 
   if (status === "done") {
     return (
-      <div className="card card-body" role="status">
+      <div role="status" className="py-4 text-center">
         {estimate ? (
           <>
-            <p className="eyebrow">Instant estimate</p>
-            <p className="result-big">{usd(estimate.value)}</p>
-            <p className="muted">
+            <div className="eyebrow">Instant estimate</div>
+            <p className="mt-2 font-serif text-5xl">{usd(estimate.value)}</p>
+            <p className="mt-2 text-sm text-muted-foreground">
               Likely range {usd(estimate.low)} – {usd(estimate.high)}
             </p>
-            <p className="small muted">
-              This automated estimate uses public records and nearby sales. It can&apos;t see your upgrades or condition,
-              so I&apos;ll follow up with a personal comparative market analysis.
+            <p className="mx-auto mt-4 max-w-md text-xs text-muted-foreground">
+              Automated estimates use public records and nearby sales and can&apos;t see upgrades or condition. We&apos;ll
+              follow up with a personal valuation within one business day.
             </p>
           </>
         ) : (
           <>
-            <p className="eyebrow">Request received</p>
-            <h2>Your home value report is on its way.</h2>
-            <p className="muted">
-              I&apos;ll review recent comparable sales near {data.address || "your home"} and send a personal valuation,
-              usually within one business day.
+            <div className="eyebrow">Received</div>
+            <h2 className="mt-2 font-serif text-2xl">Thank you.</h2>
+            <p className="mt-3 text-sm text-muted-foreground">
+              We&apos;ll review recent comparable sales near {data.address || "your home"} and be in touch within one
+              business day.
             </p>
           </>
         )}
@@ -76,112 +76,123 @@ export function ValuationForm() {
     );
   }
 
+  const back = (to: number) => (
+    <button type="button" onClick={() => setStep(to)} className={btn.outline}>
+      Back
+    </button>
+  );
+
   return (
-    <div className="card card-body">
-      <div className="steps" aria-hidden="true">
+    <div>
+      <div className="mb-6 flex gap-2" aria-hidden="true">
         {[1, 2, 3].map((s) => (
-          <span key={s} className={s <= step ? "on" : ""} />
+          <span key={s} className={`h-1 flex-1 rounded-full ${s <= step ? "bg-accent" : "bg-border"}`} />
         ))}
       </div>
-      <p className="small muted" aria-live="polite">
+      <p className="eyebrow mb-4" aria-live="polite">
         Step {step} of 3
       </p>
 
       {step === 1 && (
-        <form onSubmit={next} className="form-grid">
-          <label className="full">
-            Property address
-            <input name="address" required autoComplete="street-address" placeholder="123 Main St, City, ST 00000" defaultValue={data.address} />
+        <form onSubmit={next} className="space-y-4">
+          <label className={label}>
+            Property address *
+            <input
+              name="address"
+              required
+              autoComplete="street-address"
+              placeholder="123 Main St, City, ST 00000"
+              defaultValue={data.address}
+              className={control}
+            />
           </label>
-          <div className="full">
-            <button className="btn btn-accent">Next</button>
-          </div>
+          <button className={`${btn.primary} w-full`}>Continue</button>
         </form>
       )}
 
       {step === 2 && (
-        <form onSubmit={next} className="form-grid">
-          <label>
-            Property type
-            <select name="propertyType" defaultValue={data.propertyType || "Single Family"}>
-              <option>Single Family</option>
-              <option>Condo</option>
-              <option>Townhouse</option>
-              <option>Multi-Family</option>
-            </select>
-          </label>
-          <label>
-            Bedrooms
-            <input name="beds" type="number" min={0} max={20} defaultValue={data.beds} />
-          </label>
-          <label>
-            Bathrooms
-            <input name="baths" type="number" min={0} max={20} step={0.5} defaultValue={data.baths} />
-          </label>
-          <label>
-            Square feet
-            <input name="sqft" type="number" min={100} max={50000} defaultValue={data.sqft} />
-          </label>
-          <label>
-            Condition
-            <select name="condition" defaultValue={data.condition || "Average"}>
-              <option>Needs work</option>
-              <option>Average</option>
-              <option>Updated</option>
-              <option>Fully remodeled</option>
-            </select>
-          </label>
-          <label>
-            Thinking of selling…
-            <select name="timeline" defaultValue={data.timeline || "Just curious"}>
-              <option>Within 3 months</option>
-              <option>3–6 months</option>
-              <option>6–12 months</option>
-              <option>Just curious</option>
-            </select>
-          </label>
-          <div className="full" style={{ display: "flex", gap: 8 }}>
-            <button type="button" className="btn btn-ghost" onClick={() => setStep(1)}>
-              Back
-            </button>
-            <button className="btn btn-accent">Next</button>
+        <form onSubmit={next} className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className={label}>
+              Property type
+              <select name="propertyType" defaultValue={data.propertyType || "Single Family"} className={control}>
+                <option>Single Family</option>
+                <option>Condo</option>
+                <option>Townhouse</option>
+                <option>Multi-Family</option>
+              </select>
+            </label>
+            <label className={label}>
+              Bedrooms
+              <input name="beds" type="number" min={0} max={20} defaultValue={data.beds} className={control} />
+            </label>
+            <label className={label}>
+              Bathrooms
+              <input name="baths" type="number" min={0} max={20} step={0.5} defaultValue={data.baths} className={control} />
+            </label>
+            <label className={label}>
+              Square feet
+              <input name="sqft" type="number" min={100} max={50000} defaultValue={data.sqft} className={control} />
+            </label>
+            <label className={label}>
+              Condition
+              <select name="condition" defaultValue={data.condition || "Average"} className={control}>
+                <option>Needs work</option>
+                <option>Average</option>
+                <option>Updated</option>
+                <option>Fully remodeled</option>
+              </select>
+            </label>
+            <label className={label}>
+              Timeframe
+              <select name="timeline" defaultValue={data.timeline || "Exploring"} className={control}>
+                <option>Exploring</option>
+                <option>0–3 months</option>
+                <option>3–6 months</option>
+                <option>6–12 months</option>
+              </select>
+            </label>
+          </div>
+          <div className="flex gap-2">
+            {back(1)}
+            <button className={`${btn.primary} flex-1`}>Continue</button>
           </div>
         </form>
       )}
 
       {step === 3 && (
-        <form onSubmit={submit} className="form-grid">
-          <label>
-            Name
-            <input name="name" required autoComplete="name" />
-          </label>
-          <label>
-            Email
-            <input name="email" type="email" required autoComplete="email" />
-          </label>
-          <label className="full">
+        <form onSubmit={submit} className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className={label}>
+              Name *
+              <input name="name" required autoComplete="name" className={control} />
+            </label>
+            <label className={label}>
+              Email *
+              <input name="email" type="email" required autoComplete="email" className={control} />
+            </label>
+          </div>
+          <label className={label}>
             Phone (optional)
-            <input name="phone" type="tel" autoComplete="tel" />
+            <input name="phone" type="tel" autoComplete="tel" className={control} />
           </label>
-          <label className="hp" aria-hidden="true">
+          <label className="absolute -left-[9999px]" aria-hidden="true">
             Website
             <input name="website" tabIndex={-1} autoComplete="off" />
           </label>
-          <label className="checkbox full">
-            <input type="checkbox" name="consent" required />
-            <span className="small">I agree to be contacted about my home&apos;s value. No obligation.</span>
+          <label className="flex items-start gap-3 text-xs text-muted-foreground">
+            <input type="checkbox" name="consent" required className="mt-0.5" />
+            <span>I agree to be contacted about my home&apos;s value. No obligation.</span>
           </label>
-          {status === "err" && (
-            <p className="notice err full" role="alert">
+          {status === "err" ? (
+            <p role="alert" className="text-xs text-destructive">
               {error}
             </p>
-          )}
-          <div className="full" style={{ display: "flex", gap: 8 }}>
-            <button type="button" className="btn btn-ghost" onClick={() => setStep(2)}>
-              Back
-            </button>
-            <button className="btn btn-accent" disabled={status === "sending"}>
-              {status === "sending" ? "Calculating…" : "Get my home value"}
+          ) : null}
+          <div className="flex gap-2">
+            {back(2)}
+            <button className={`${btn.primary} flex-1`} disabled={status === "sending"}>
+              {status === "sending" ? "Sending…" : "Request valuation"}
             </button>
           </div>
         </form>

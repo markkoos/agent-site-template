@@ -3,7 +3,7 @@ import { parseFilters, searchListings } from "@/lib/listings";
 
 /**
  * JSON search endpoint — for a map view, infinite scroll, or a client-side widget.
- * Same filters as the /listings page: ?city=&minPrice=&maxPrice=&beds=&baths=&type=&status=&sort=&page=
+ * Same filters as the /properties page: ?city=&minPrice=&maxPrice=&beds=&baths=&type=&status=&sort=&page=
  */
 export async function GET(req: Request) {
   const url = new URL(req.url);

@@ -21,10 +21,10 @@ export async function GET() {
 Contact: ${a.phone} · ${a.email} · ${b.address.street}, ${b.address.city}, ${b.address.state} ${b.address.zip}
 
 ## Key pages
-- [Search homes for sale](${u}/listings): current listings with photos, prices and details
-- [Home value estimate](${u}/home-valuation): instant estimate plus a free comparative market analysis
+- [Properties for sale](${u}/properties): current listings with photos, prices and details
+- [Home evaluation](${u}/home-evaluation): free, agent-prepared home valuation
 - [Mortgage calculator](${u}/tools/mortgage-calculator)
-- [About ${a.name}](${u}/about): credentials, designations and license verification
+- [About ${site.brand.siteName}](${u}/about): credentials, designations and license verification
 - [Contact](${u}/contact)
 
 ## Neighborhood guides

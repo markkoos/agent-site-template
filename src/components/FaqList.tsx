@@ -9,13 +9,16 @@ import { JsonLd } from "./JsonLd";
 export function FaqList({ faqs, withSchema = true }: { faqs: Faq[]; withSchema?: boolean }) {
   if (!faqs.length) return null;
   return (
-    <div className="faq">
+    <div className="divide-y divide-border/60 border-y border-border/60">
       {faqs.map((f) => (
-        <details key={f.q}>
-          <summary>
-            <h3 style={{ display: "inline", fontSize: "1rem", fontFamily: "inherit" }}>{f.q}</h3>
+        <details key={f.q} className="group py-5">
+          <summary className="flex cursor-pointer list-none items-start justify-between gap-6 [&::-webkit-details-marker]:hidden">
+            <h3 className="font-serif text-xl leading-snug">{f.q}</h3>
+            <span aria-hidden="true" className="mt-1 text-accent transition-transform group-open:rotate-45">
+              +
+            </span>
           </summary>
-          <p>{f.a}</p>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">{f.a}</p>
         </details>
       ))}
       {withSchema && <JsonLd data={faqSchema(faqs)} />}

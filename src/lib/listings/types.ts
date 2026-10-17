@@ -4,6 +4,8 @@ export type ListingStatus = "Active" | "Coming Soon" | "Pending" | "Sold";
 export interface Listing {
   listingKey: string;
   slug: string;
+  /** Optional marketing name ("Modern Hillside Retreat"). Falls back to the street address. */
+  title?: string;
   mlsNumber?: string;
   status: ListingStatus;
   price: number;

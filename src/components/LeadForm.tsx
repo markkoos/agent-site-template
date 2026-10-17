@@ -1,23 +1,30 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { btn, control, label } from "./ui";
 
 type Props = {
   type?: "contact" | "showing";
   listingSlug?: string;
   submitLabel?: string;
   defaultMessage?: string;
+  messageLabel?: string;
 };
 
-export function LeadForm({ type = "contact", listingSlug, submitLabel = "Send message", defaultMessage = "" }: Props) {
+export function LeadForm({
+  type = "contact",
+  listingSlug,
+  submitLabel = "Send message",
+  defaultMessage = "",
+  messageLabel = "How can we help?",
+}: Props) {
   const [state, setState] = useState<"idle" | "sending" | "ok" | "err">("idle");
   const [error, setError] = useState("");
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setState("sending");
-    const form = new FormData(e.currentTarget);
-    const body = Object.fromEntries(form.entries());
+    const body = Object.fromEntries(new FormData(e.currentTarget).entries());
     try {
       const res = await fetch("/api/leads", {
         method: "POST",
@@ -25,59 +32,61 @@ export function LeadForm({ type = "contact", listingSlug, submitLabel = "Send me
         body: JSON.stringify({ ...body, type, listingSlug, page: window.location.pathname }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Something went wrong.");
+      if (!res.ok) throw new Error(data.error || "Something went wrong. Please try again.");
       setState("ok");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
       setState("err");
     }
   }
 
   if (state === "ok") {
     return (
-      <p className="notice ok" role="status">
-        Thanks — your message is in. I&apos;ll get back to you shortly.
-      </p>
+      <div role="status" className="py-6 text-center">
+        <div className="eyebrow">Sent</div>
+        <p className="mt-2 font-serif text-2xl">Thank you.</p>
+        <p className="mt-2 text-sm text-muted-foreground">We&apos;ll follow up within one business day.</p>
+      </div>
     );
   }
 
   return (
-    <form onSubmit={onSubmit} className="form-grid" noValidate={false}>
-      <label>
-        Name
-        <input name="name" required autoComplete="name" maxLength={100} />
-      </label>
-      <label>
-        Email
-        <input name="email" type="email" required autoComplete="email" maxLength={200} />
-      </label>
-      <label className="full">
+    <form onSubmit={onSubmit} className="space-y-4">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className={label}>
+          Name *
+          <input name="name" required autoComplete="name" maxLength={100} className={control} />
+        </label>
+        <label className={label}>
+          Email *
+          <input name="email" type="email" required autoComplete="email" maxLength={200} className={control} />
+        </label>
+      </div>
+      <label className={label}>
         Phone (optional)
-        <input name="phone" type="tel" autoComplete="tel" maxLength={30} />
+        <input name="phone" type="tel" autoComplete="tel" maxLength={30} className={control} />
       </label>
-      <label className="full">
-        Message
-        <textarea name="message" defaultValue={defaultMessage} maxLength={2000} />
+      <label className={label}>
+        {messageLabel}
+        <textarea name="message" rows={5} defaultValue={defaultMessage} maxLength={2000} className={control} />
       </label>
       {/* Honeypot: real people never see or fill this */}
-      <label className="hp" aria-hidden="true">
+      <label className="absolute -left-[9999px]" aria-hidden="true">
         Website
         <input name="website" tabIndex={-1} autoComplete="off" />
       </label>
-      <label className="checkbox full">
-        <input type="checkbox" name="consent" required />
-        <span className="small">I agree to be contacted by phone, text or email about my inquiry. Msg/data rates may apply.</span>
+      <label className="flex items-start gap-3 text-xs text-muted-foreground">
+        <input type="checkbox" name="consent" required className="mt-0.5" />
+        <span>I agree to be contacted by phone, text or email about my inquiry. Msg/data rates may apply.</span>
       </label>
-      {state === "err" && (
-        <p className="notice err full" role="alert">
+      <button className={`${btn.primary} w-full`} disabled={state === "sending"}>
+        {state === "sending" ? "Sending…" : submitLabel}
+      </button>
+      {state === "err" ? (
+        <p role="alert" className="text-xs text-destructive">
           {error}
         </p>
-      )}
-      <div className="full">
-        <button className="btn" disabled={state === "sending"}>
-          {state === "sending" ? "Sending…" : submitLabel}
-        </button>
-      </div>
+      ) : null}
     </form>
   );
 }
