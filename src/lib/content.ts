@@ -67,10 +67,10 @@ async function loadFile(dir: string, file: string) {
 export async function getAllPosts(): Promise<Post[]> {
   const files = await readDir("content/blog");
   const posts = await Promise.all(
-    files.map(async (file) => {
+    files.map(async (file): Promise<Post | null> => {
       const { slug, data, content, html } = await loadFile("content/blog", file);
       if (data.draft) return null;
-      return {
+      const post: Post = {
         slug,
         title: String(data.title ?? slug),
         description: String(data.description ?? ""),
@@ -82,7 +82,8 @@ export async function getAllPosts(): Promise<Post[]> {
         sources: (data.sources as SourceLink[]) ?? [],
         html,
         readingMinutes: Math.max(1, Math.round(content.split(/\s+/).length / 225)),
-      } satisfies Post;
+      };
+      return post;
     }),
   );
   return posts.filter((p): p is Post => p !== null).sort((a, b) => b.date.localeCompare(a.date));
