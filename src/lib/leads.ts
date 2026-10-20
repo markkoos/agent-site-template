@@ -1,4 +1,5 @@
 import { connectDb, hasDb } from "./db";
+import { emailConfigured, sendLeadEmail } from "./email";
 import { LeadModel, type Lead } from "./models/Lead";
 
 /** Best-effort, per-instance rate limiter (good enough to stop casual form spam). */
@@ -21,21 +22,45 @@ export const isEmail = (s: unknown): s is string =>
 
 export const clean = (s: unknown, max = 500) => (typeof s === "string" ? s.trim().slice(0, max) : undefined);
 
-/** Save to MongoDB (if configured) and forward to LEAD_WEBHOOK_URL (if configured). */
+/**
+ * Deliver a lead through every configured channel:
+ *   1. MongoDB (MONGODB_URI)        — permanent record
+ *   2. Email via Resend             — instant notification to the agent
+ *   3. Webhook (LEAD_WEBHOOK_URL)   — CRM / Zapier / Slack
+ * One channel failing doesn't lose the lead; we only report an error to the
+ * visitor if NO configured channel succeeded.
+ */
 export async function saveLead(lead: Omit<Lead, "createdAt">) {
   const record = { ...lead, createdAt: new Date() };
+  const attempted: string[] = [];
+  const delivered: string[] = [];
 
   if (hasDb()) {
-    await connectDb();
-    await LeadModel.create(record);
-  } else {
-    console.info("[lead] (demo mode — not stored)", record.type, record.email);
+    attempted.push("db");
+    try {
+      await connectDb();
+      await LeadModel.create(record);
+      delivered.push("db");
+    } catch (err) {
+      console.error("[lead] database save failed", err);
+    }
+  }
+
+  if (emailConfigured()) {
+    attempted.push("email");
+    try {
+      await sendLeadEmail(record);
+      delivered.push("email");
+    } catch (err) {
+      console.error("[lead] email failed", err);
+    }
   }
 
   const hook = process.env.LEAD_WEBHOOK_URL;
   if (hook) {
+    attempted.push("webhook");
     try {
-      await fetch(hook, {
+      const res = await fetch(hook, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -44,8 +69,16 @@ export async function saveLead(lead: Omit<Lead, "createdAt">) {
         }),
         signal: AbortSignal.timeout(5000),
       });
+      if (res.ok) delivered.push("webhook");
+      else console.error("[lead] webhook returned", res.status);
     } catch (err) {
       console.error("[lead] webhook failed", err);
     }
   }
+
+  if (!attempted.length) {
+    console.info("[lead] (demo mode — no database, email or webhook configured)", record.type, record.email);
+    return;
+  }
+  if (!delivered.length) throw new Error(`Lead not delivered (tried: ${attempted.join(", ")})`);
 }

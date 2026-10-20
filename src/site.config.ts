@@ -91,6 +91,14 @@ export const site = {
     youtube: "",
   },
 
+  /**
+   * Who receives new-lead emails (home evaluations, viewing requests, messages).
+   * Empty = agent.email. LEAD_NOTIFY_EMAIL in the environment overrides this.
+   */
+  leads: {
+    notifyTo: [] as string[],
+  },
+
   officeHours: "Mon–Fri 9am–6pm",
 
   nav: [
